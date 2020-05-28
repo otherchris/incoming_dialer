@@ -12,7 +12,7 @@ defmodule IncomingDialer do
   # Client API
 
   @doc """
-  Start the dialer 
+  Start the dialer
   """
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, opts)
@@ -43,7 +43,7 @@ defmodule IncomingDialer do
     {:ok, %{body: body}} =
       HTTPoison.post(
         E.sms_url(),
-        {:form, [Body: message, From: E.host_number(), To: "+15025551234"]},
+        {:form, [Body: message, From: E.from_number(), To: phone_number]},
         [],
         hackney: [basic_auth: {E.account_sid(), E.api_key()}]
       )

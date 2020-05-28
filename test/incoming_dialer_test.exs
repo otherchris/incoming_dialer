@@ -19,7 +19,7 @@ defmodule IncomingDialerTest do
 
   describe "send_sms" do
     test "sends an sms", %{dialer: d} do
-      :ok = IncomingDialer.send_sms(d, "message", "phonenumber")
+      :ok = IncomingDialer.send_sms(d, "message", "502-555-1354")
       state = :sys.get_state(d)
     end
   end
