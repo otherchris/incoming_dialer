@@ -23,4 +23,10 @@ defmodule IncomingDialerTest do
       state = :sys.get_state(d)
     end
   end
+
+  describe "incoming_call" do
+    test "respond with twiml", %{dialer: d} do
+      twiml = IncomingDialer.incoming_call(d, %{}) |> IO.inspect
+    end
+  end
 end

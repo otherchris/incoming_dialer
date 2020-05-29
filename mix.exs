@@ -26,7 +26,8 @@ defmodule IncomingDialer.MixProject do
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:httpoison, "~> 1.6"},
       {:jason, "~> 1.2"},
-      {:sweet_xml, "~> 0.6.6"}
+      {:sweet_xml, "~> 0.6.6"},
+      {:ex_twilio, "~> 0.8.1"}
     ]
   end
 end

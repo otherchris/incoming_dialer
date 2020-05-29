@@ -26,11 +26,25 @@ defmodule IncomingDialer do
     GenServer.cast(dialer, {:send_sms, message, phone_number})
   end
 
+  def incoming_call(dialer, call_data) do
+    GenServer.call(dialer, {:incoming_call, call_data})
+  end
+
   # Server callbacks
 
   @impl true
   def init(:ok) do
     {:ok, %DialerState{}}
+  end
+
+  def handle_call({:incoming_call, call_data}, _from, state) do
+    resp = """
+    <?xml version=”1.0" encoding=”UTF-8" ?>
+    <Response>
+      <Say>Hamburger Bambuger</Say>
+    </Response>
+    """
+    {:reply, resp, state}
   end
 
   @impl true
