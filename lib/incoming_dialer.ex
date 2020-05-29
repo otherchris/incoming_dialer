@@ -39,7 +39,7 @@ defmodule IncomingDialer do
 
   def handle_call({:incoming_call, call_data}, _from, state) do
     resp = """
-    <?xml version=”1.0" encoding=”UTF-8" ?>
+    <?xml version="1.0" encoding="UTF-8" ?>
     <Response>
       <Say>Hamburger Bambuger</Say>
     </Response>
