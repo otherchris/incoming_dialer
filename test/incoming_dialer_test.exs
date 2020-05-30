@@ -17,6 +17,15 @@ defmodule IncomingDialerTest do
     end
   end
 
+  describe "set_incoming_numbers" do
+    test "sets the list of incoming numbers", %{dialer: d} do
+      before_nums = ["5025551234", "5025551235"]
+      IncomingDialer.set_incoming_numbers(d, before_nums) 
+      %{incoming_numbers: nums} = :sys.get_state(d)
+      assert nums == before_nums
+    end
+  end
+
   describe "send_sms" do
     test "sends an sms", %{dialer: d} do
       :ok = IncomingDialer.send_sms(d, "message", "502-555-1354")
@@ -25,8 +34,9 @@ defmodule IncomingDialerTest do
   end
 
   describe "incoming_call" do
-    test "respond with twiml", %{dialer: d} do
-      twiml = IncomingDialer.incoming_call(d, %{}) |> IO.inspect
+    test "", %{dialer: d} do
+
+      twiml = IncomingDialer.incoming_call(d, %{})
     end
   end
 end

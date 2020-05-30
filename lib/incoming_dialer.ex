@@ -7,8 +7,6 @@ defmodule IncomingDialer do
   alias IncomingDialer.DialerState
   alias IncomingDialer.Environment, as: E
 
-  import SweetXml
-
   # Client API
 
   @doc """
@@ -20,6 +18,10 @@ defmodule IncomingDialer do
 
   def report(dialer) do
     GenServer.call(dialer, :report)
+  end
+
+  def set_incoming_numbers(dialer, nums) when is_list(nums) do
+    GenServer.cast(dialer, {:set_incoming_numbers, nums})
   end
 
   def send_sms(dialer, message, phone_number) do
@@ -53,6 +55,11 @@ defmodule IncomingDialer do
   end
 
   @impl true
+  def handle_cast({:set_incoming_numbers, nums}, state) do
+    {:noreply, Map.put(state, :incoming_numbers, nums)}
+  end
+
+  @impl true
   def handle_cast({:send_sms, message, phone_number}, state) do
     {:ok, %{body: body}} =
       HTTPoison.post(
@@ -64,7 +71,6 @@ defmodule IncomingDialer do
 
     body
     |> Jason.decode!()
-    |> IO.inspect()
 
     {:noreply, state}
   end
