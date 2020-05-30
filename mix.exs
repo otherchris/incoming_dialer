@@ -14,8 +14,7 @@ defmodule IncomingDialer.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :plug_cowboy],
-      mod: {IncomingDialer.Application, []}
+      extra_applications: [:logger]
     ]
   end
 
@@ -27,7 +26,6 @@ defmodule IncomingDialer.MixProject do
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:httpoison, "~> 1.6"},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.0"}
     ]
   end
 end

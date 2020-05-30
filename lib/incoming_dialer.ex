@@ -6,6 +6,7 @@ defmodule IncomingDialer do
   use GenServer
   alias IncomingDialer.DialerState
   alias IncomingDialer.Environment, as: E
+  alias IncomingDialer.Templates, as: T
 
   # Client API
 
@@ -39,19 +40,40 @@ defmodule IncomingDialer do
     {:ok, %DialerState{}}
   end
 
-  def handle_call({:incoming_call, call_data}, _from, state) do
-    resp = """
-    <?xml version="1.0" encoding="UTF-8" ?>
-    <Response>
-      <Say>Hamburger Bambuger</Say>
-    </Response>
-    """
+  def handle_call({:incoming_call, call_data}, _from, state = %{incoming_numbers: []}) do
+    resp = EEx.eval_string(T.incoming_call, state.incoming_call_assigns)
     {:reply, resp, state}
+  end
+
+  def handle_call({:incoming_call, call_data}, _from, state = %{incoming_numbers: inc_nums}) do
+    {resp, to_num} = 
+      with [to_num | _] <- Enum.reject(inc_nums, &number_in_use(state.calls_in_progress, &1)) do
+        {
+          EEx.eval_string(T.incoming_call, incoming_template_data([fallback: false, number: to_num])),
+          to_num
+        }
+      else
+        _ -> {EEx.eval_string(T.incoming_call, incoming_template_data([])), ""}
+      end
+    new_call = %{
+      to: to_num,
+      ref_id: call_data["CallSid"]
+    }
+    {:reply, resp, state, {:continue, {:new_call, new_call}}}
   end
 
   @impl true
   def handle_call(:report, _from, state) do
     {:reply, state, state}
+  end
+
+  @impl true
+  def handle_continue({:new_call, new_call}, state = %{calls_in_progress: cip, numbers_in_use: niu}) do
+    new_state = %{
+      calls_in_progress: cip ++ [new_call],
+      numbers_in_use: niu ++ [new_call.to]
+    }
+    {:noreply, Map.merge(state, new_state)}
   end
 
   @impl true
@@ -73,5 +95,17 @@ defmodule IncomingDialer do
     |> Jason.decode!()
 
     {:noreply, state}
+  end
+
+  defp incoming_template_data(kwl) do
+    default = [number: "", fallback: true, fallback_message: "no_number"]
+    Keyword.merge(default, kwl)
+  end
+
+  defp number_in_use(call_list, number) do
+    call_list
+    |> Enum.find(&(&1.to == number))
+    |> is_nil
+    |> Kernel.!
   end
 end
