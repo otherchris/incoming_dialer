@@ -1,5 +1,11 @@
 defmodule IncomingDialer.DialerState do
   @moduledoc false
 
-  defstruct type: :none
+  defstruct [
+    incoming_call_assigns: [
+      number: "",
+      fallback: true,
+      fallback_message: "No numbers to call"
+    ]
+  ]
 end
