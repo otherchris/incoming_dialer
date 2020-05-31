@@ -13,6 +13,10 @@ defmodule IncomingDialer do
   @doc """
   Start the dialer
   """
+  def start_link(initial, opts) do
+    GenServer.start_link(__MODULE__, initial, opts)
+  end
+
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
@@ -62,6 +66,11 @@ defmodule IncomingDialer do
   @impl true
   def init(:ok) do
     {:ok, %DialerState{}}
+  end
+
+  @impl true
+  def init(initial) do
+    {:ok, struct(%DialerState{}, initial)}
   end
 
   def handle_call({:incoming_call, call_data}, _from, state = %{incoming_numbers: []}) do
