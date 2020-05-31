@@ -80,7 +80,7 @@ defmodule IncomingDialer do
 
   def handle_call({:incoming_call, call_data}, _from, state = %{incoming_numbers: inc_nums}) do
     {resp, to_num} =
-      with [to_num | _] <- Enum.reject(inc_nums, &number_in_use(state.calls_in_progress, &1)) do
+      with [to_num | _] <- Enum.reject(inc_nums, &Enum.member?(state.numbers_in_use, &1)) do
         {
           EEx.eval_string(
             T.incoming_call(),
@@ -155,12 +155,5 @@ defmodule IncomingDialer do
 
   defp end_call_url(state, number) do
     "#{state.url_base}/end-call/#{number}"
-  end
-
-  defp number_in_use(call_list, number) do
-    call_list
-    |> Enum.find(&(&1.to == number))
-    |> is_nil
-    |> Kernel.!()
   end
 end

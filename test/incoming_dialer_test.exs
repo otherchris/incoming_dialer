@@ -60,12 +60,6 @@ defmodule IncomingDialerTest do
 
   describe "incoming_call" do
     test "adds call to in progress calls", %{dialer: d} do
-      IncomingDialer.set_incoming_numbers(d, @before_nums)
-      :sys.get_state(d)
-      IncomingDialer.incoming_call(d, @incoming_call_data)
-      %{calls_in_progress: [call]} = :sys.get_state(d)
-      assert call.to == @before_nums |> hd
-      assert call.ref_id == @incoming_call_data["CallSid"]
     end
 
     test "adds number applied to numbers_in_use", %{dialer: d} do
