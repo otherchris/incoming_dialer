@@ -12,8 +12,8 @@ defmodule IncomingDialerTest do
     "CallStatus" => "ringing"
   }
   @end_call_data %{
-    "CallSid" => "CAd751de46b9ad916470d2840221134936",
-    "CallStatus" => "ended"
+    "DialCallSid" => "CAd751de46b9ad916470d2840221134936",
+    "call_number" => "5025551234"
   }
 
   setup do
@@ -45,16 +45,16 @@ defmodule IncomingDialerTest do
 
   describe "end call" do
     test "removes call from in progress calls", %{dialer: d} do
+    end
+
+    test "removes number from numbers in use", %{dialer: d} do
       IncomingDialer.set_incoming_numbers(d, @before_nums)
       :sys.get_state(d)
       IncomingDialer.incoming_call(d, @incoming_call_data)
       :sys.get_state(d)
       IncomingDialer.end_call(d, @end_call_data)
-      %{calls_in_progress: cip} = :sys.get_state(d)
-      assert cip == []
-    end
-
-    test "removes number from numbers in use", %{dialer: d} do
+      %{numbers_in_use: niu} = :sys.get_state(d)
+      assert niu == []
     end
   end
 

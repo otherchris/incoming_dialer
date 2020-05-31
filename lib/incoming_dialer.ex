@@ -84,7 +84,7 @@ defmodule IncomingDialer do
         {
           EEx.eval_string(
             T.incoming_call(),
-            incoming_template_data(fallback: false, number: to_num, action_url: action_url(state, to_num))
+            incoming_template_data(fallback: false, number: to_num, action_url: end_call_url(state, to_num))
           ),
           to_num
         }
@@ -101,9 +101,12 @@ defmodule IncomingDialer do
   end
 
   def handle_call({:end_call, call_data}, _from, state) do
-    ref_id = call_data["CallSid"]
-    new_cip = Enum.reject(state.calls_in_progress, &(&1.ref_id == ref_id))
-    {:reply, nil, Map.put(state, :calls_in_progress, new_cip)}
+    call_number = call_data["call_number"]
+    new_niu = Enum.reject(state.numbers_in_use, &(&1 == call_number))
+    new_state =
+      state
+      |> Map.put(:numbers_in_use, new_niu)
+    {:reply, nil, new_state}
   end
 
   @impl true
