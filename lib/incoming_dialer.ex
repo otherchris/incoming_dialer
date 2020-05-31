@@ -84,7 +84,7 @@ defmodule IncomingDialer do
         {
           EEx.eval_string(
             T.incoming_call(),
-            incoming_template_data(fallback: false, number: to_num)
+            incoming_template_data(fallback: false, number: to_num, action_url: end_call_url(state, to_num))
           ),
           to_num
         }
@@ -148,6 +148,10 @@ defmodule IncomingDialer do
   defp incoming_template_data(kwl) do
     default = [number: "", fallback: true, fallback_message: "no_number", action_url: "hello"]
     Keyword.merge(default, kwl)
+  end
+
+  defp end_call_url(state, number) do
+    "#{state.url_base}/end-call/#{number}"
   end
 
   defp number_in_use(call_list, number) do
