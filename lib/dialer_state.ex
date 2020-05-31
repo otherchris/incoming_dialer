@@ -8,6 +8,7 @@ defmodule IncomingDialer.DialerState do
         }
 
   defstruct incoming_numbers: [],
+            url_base: "",
             numbers_in_use: [],
             calls_in_progress: [],
             incoming_call_assigns: [

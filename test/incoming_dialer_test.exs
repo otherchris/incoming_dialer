@@ -53,6 +53,9 @@ defmodule IncomingDialerTest do
       %{calls_in_progress: cip} = :sys.get_state(d)
       assert cip == []
     end
+
+    test "removes number from numbers in use", %{dialer: d} do
+    end
   end
 
   describe "incoming_call" do
@@ -88,10 +91,24 @@ defmodule IncomingDialerTest do
       assert twiml =~ "Say"
     end
 
+    test "if all numbers in use, fallback", %{dialer: d} do
+      IncomingDialer.set_incoming_numbers(d, @before_nums)
+      :sys.get_state(d)
+      IncomingDialer.incoming_call(d, @incoming_call_data)
+      :sys.get_state(d)
+      IncomingDialer.incoming_call(d, @incoming_call_data)
+      :sys.get_state(d)
+      twiml = IncomingDialer.incoming_call(d, @incoming_call_data)
+      :sys.get_state(d) |> IO.inspect
+
+      assert twiml =~ "xml"
+      assert twiml =~ "Say"
+    end
+
     test "if first number is in use, use second", %{dialer: d} do
       IncomingDialer.set_incoming_numbers(d, @before_nums)
       :sys.get_state(d)
-      IncomingDialer.incoming_call(d, @incoming_call_data) |> IO.inspect
+      IncomingDialer.incoming_call(d, @incoming_call_data)
       :sys.get_state(d)
       IncomingDialer.incoming_call(d, @incoming_call_data)
       %{calls_in_progress: cip} = :sys.get_state(d)
