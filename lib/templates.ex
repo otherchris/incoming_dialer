@@ -1,5 +1,5 @@
 defmodule IncomingDialer.Templates do
-@moduledoc false
+  @moduledoc false
 
   def incoming_call do
     """
@@ -8,7 +8,7 @@ defmodule IncomingDialer.Templates do
       <%= if fallback do %>
         <Say voice="alice" ><%= fallback_message %></Say>
       <% else %>
-        <Dial><%= number %></Dial>
+        <Dial action=<%= action_url %>><%= number %></Dial>
       <% end %>
     </Response>
     """

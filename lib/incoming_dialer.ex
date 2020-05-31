@@ -33,6 +33,10 @@ defmodule IncomingDialer do
     GenServer.call(dialer, {:incoming_call, call_data})
   end
 
+  def end_call(dialer, end_call_data) do
+    GenServer.call(dialer, {:end_call, end_call_data})
+  end
+
   # Server callbacks
 
   @impl true
@@ -41,25 +45,36 @@ defmodule IncomingDialer do
   end
 
   def handle_call({:incoming_call, call_data}, _from, state = %{incoming_numbers: []}) do
-    resp = EEx.eval_string(T.incoming_call, state.incoming_call_assigns)
+    resp = EEx.eval_string(T.incoming_call(), state.incoming_call_assigns)
     {:reply, resp, state}
   end
 
   def handle_call({:incoming_call, call_data}, _from, state = %{incoming_numbers: inc_nums}) do
-    {resp, to_num} = 
+    {resp, to_num} =
       with [to_num | _] <- Enum.reject(inc_nums, &number_in_use(state.calls_in_progress, &1)) do
         {
-          EEx.eval_string(T.incoming_call, incoming_template_data([fallback: false, number: to_num])),
+          EEx.eval_string(
+            T.incoming_call(),
+            incoming_template_data(fallback: false, number: to_num)
+          ),
           to_num
         }
       else
-        _ -> {EEx.eval_string(T.incoming_call, incoming_template_data([])), ""}
+        _ -> {EEx.eval_string(T.incoming_call(), incoming_template_data([])), ""}
       end
+
     new_call = %{
       to: to_num,
       ref_id: call_data["CallSid"]
     }
+
     {:reply, resp, state, {:continue, {:new_call, new_call}}}
+  end
+
+  def handle_call({:end_call, call_data}, _from, state) do
+    ref_id = call_data["CallSid"]
+    new_cip = Enum.reject(state.calls_in_progress, &(&1.ref_id == ref_id))
+    {:reply, nil, Map.put(state, :calls_in_progress, new_cip)}
   end
 
   @impl true
@@ -68,11 +83,15 @@ defmodule IncomingDialer do
   end
 
   @impl true
-  def handle_continue({:new_call, new_call}, state = %{calls_in_progress: cip, numbers_in_use: niu}) do
+  def handle_continue(
+        {:new_call, new_call},
+        state = %{calls_in_progress: cip, numbers_in_use: niu}
+      ) do
     new_state = %{
       calls_in_progress: cip ++ [new_call],
       numbers_in_use: niu ++ [new_call.to]
     }
+
     {:noreply, Map.merge(state, new_state)}
   end
 
@@ -98,7 +117,7 @@ defmodule IncomingDialer do
   end
 
   defp incoming_template_data(kwl) do
-    default = [number: "", fallback: true, fallback_message: "no_number"]
+    default = [number: "", fallback: true, fallback_message: "no_number", action_url: "hello"]
     Keyword.merge(default, kwl)
   end
 
@@ -106,6 +125,6 @@ defmodule IncomingDialer do
     call_list
     |> Enum.find(&(&1.to == number))
     |> is_nil
-    |> Kernel.!
+    |> Kernel.!()
   end
 end

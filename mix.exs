@@ -25,7 +25,7 @@ defmodule IncomingDialer.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
       {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:httpoison, "~> 1.6"},
-      {:jason, "~> 1.2"},
+      {:jason, "~> 1.2"}
     ]
   end
 end
