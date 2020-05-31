@@ -8,7 +8,7 @@ defmodule IncomingDialer.Templates do
       <%= if fallback do %>
         <Say voice="alice" ><%= fallback_message %></Say>
       <% else %>
-        <Dial action=<%= action_url %>><%= number %></Dial>
+        <Dial action="<%= action_url %>"><%= number %></Dial>
       <% end %>
     </Response>
     """

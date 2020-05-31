@@ -17,22 +17,42 @@ defmodule IncomingDialer do
     GenServer.start_link(__MODULE__, :ok, opts)
   end
 
+  @doc """
+  Returns the state of the dialer
+  """
+  @spec report(pid) :: DialerState.t()
   def report(dialer) do
     GenServer.call(dialer, :report)
   end
 
+  @doc """
+  Set the incoming_numbers filed in the dialer state. These are the numbers that
+  will receive incoming calls
+  """
+  @spec set_incoming_numbers(pid, list(String.t())) :: :ok
   def set_incoming_numbers(dialer, nums) when is_list(nums) do
     GenServer.cast(dialer, {:set_incoming_numbers, nums})
   end
 
+  @doc """
+  Send an sms message
+  """
+  @spec send_sms(pid, String.t(), String.t()) :: :ok
   def send_sms(dialer, message, phone_number) do
     GenServer.cast(dialer, {:send_sms, message, phone_number})
   end
 
+  @doc """
+  Handle the incoming call webhook
+  """
+  @spec incoming_call(pid, map) :: DialerState.t()
   def incoming_call(dialer, call_data) do
     GenServer.call(dialer, {:incoming_call, call_data})
   end
 
+  @doc """
+  Handle the end call webhook
+  """
   def end_call(dialer, end_call_data) do
     GenServer.call(dialer, {:end_call, end_call_data})
   end

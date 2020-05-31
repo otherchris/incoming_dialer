@@ -91,7 +91,7 @@ defmodule IncomingDialerTest do
     test "if first number is in use, use second", %{dialer: d} do
       IncomingDialer.set_incoming_numbers(d, @before_nums)
       :sys.get_state(d)
-      IncomingDialer.incoming_call(d, @incoming_call_data)
+      IncomingDialer.incoming_call(d, @incoming_call_data) |> IO.inspect
       :sys.get_state(d)
       IncomingDialer.incoming_call(d, @incoming_call_data)
       %{calls_in_progress: cip} = :sys.get_state(d)
