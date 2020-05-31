@@ -84,7 +84,7 @@ defmodule IncomingDialer do
         {
           EEx.eval_string(
             T.incoming_call(),
-            incoming_template_data(fallback: false, number: to_num, action_url: end_call_url(state, to_num))
+            incoming_template_data(fallback: false, number: to_num, action_url: action_url(state, to_num))
           ),
           to_num
         }
