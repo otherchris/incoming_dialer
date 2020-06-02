@@ -27,12 +27,31 @@ defmodule IncomingDialerTest do
     end
   end
 
+  describe "remove_incoming_number" do
+    test "removes a number from the list of incoming number", %{dialer: d} do
+      IncomingDialer.set_incoming_numbers(d, @before_nums)
+      :sys.get_state(d)
+      IncomingDialer.remove_incoming_number(d, @before_nums |> hd)
+      %{incoming_numbers: inc_nums} = :sys.get_state(d)
+      assert inc_nums == [List.last(@before_nums)]
+    end
+  end
+
+  describe "add_incoming_number" do
+    test "adds a number to the list of incoming number", %{dialer: d} do
+      IncomingDialer.set_incoming_numbers(d, @before_nums)
+      :sys.get_state(d)
+      IncomingDialer.add_incoming_number(d, "berble")
+      %{incoming_numbers: inc_nums} = :sys.get_state(d)
+      assert Enum.member?(inc_nums, "berble")
+    end
+  end
+
   describe "set_incoming_numbers" do
     test "sets the list of incoming numbers", %{dialer: d} do
-      before_nums = ["5025551234", "5025551235"]
-      IncomingDialer.set_incoming_numbers(d, before_nums)
+      IncomingDialer.set_incoming_numbers(d, @before_nums)
       %{incoming_numbers: nums} = :sys.get_state(d)
-      assert nums == before_nums
+      assert nums == @before_nums
     end
   end
 

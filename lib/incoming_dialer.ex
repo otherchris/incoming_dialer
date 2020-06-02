@@ -39,6 +39,22 @@ defmodule IncomingDialer do
   end
 
   @doc """
+  Remove a number from the list of answering numbers
+  """
+  @spec remove_incoming_number(pid, String.t()) :: :ok
+  def remove_incoming_number(dialer, number) do
+    GenServer.cast(dialer, {:remove_incoming_number, number})
+  end
+
+  @doc """
+  Add a number to the list of answering numbers
+  """
+  @spec add_incoming_number(pid, String.t()) :: :ok
+  def add_incoming_number(dialer, number) do
+    GenServer.cast(dialer, {:add_incoming_number, number})
+  end
+
+  @doc """
   Send an sms message
   """
   @spec send_sms(pid, String.t(), String.t()) :: :ok
@@ -130,6 +146,21 @@ defmodule IncomingDialer do
   @impl true
   def handle_cast({:set_incoming_numbers, nums}, state) do
     {:noreply, Map.put(state, :incoming_numbers, nums)}
+  end
+
+  @impl true
+  def handle_cast({:add_incoming_number, number}, state = %{incoming_numbers: inc_nums}) do
+    new = 
+      inc_nums
+      |> Kernel.++([number])
+      |> Enum.uniq
+    {:noreply, Map.put(state, :incoming_numbers, new)}
+  end
+
+  @impl true
+  def handle_cast({:remove_incoming_number, number}, state = %{incoming_numbers: inc_nums}) do
+    new = Enum.reject(inc_nums, &(&1 == number))
+    {:noreply, Map.put(state, :incoming_numbers, new)}
   end
 
   @impl true
